@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Hóa Đơn</title>
+  <style>
+    body {
+      font-family: "DejaVu Sans", Arial, sans-serif;
+      margin: 20px;
+      color: #333;
+    }
+    .header, .info, .order-details {
+      text-align: center;
+    }
+    .header h1 {
+      font-size: 24px;
+      margin-bottom: 0;
+    }
+    .header p, .info p {
+      margin: 2px 0;
+    }
+    .order-details table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    .order-details table, .order-details th, .order-details td {
+      border: 1px solid #000;
+    }
+    .order-details th, .order-details td {
+      padding: 8px;
+      text-align: center;
+    }
+    .order-details th {
+      background-color: #f2f2f2;
+    }
+    .summary {
+      margin-top: 20px;
+      width: 100%;
+    }
+    .summary table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .summary td {
+      padding: 8px;
+      text-align: right;
+    }
+    .summary td:first-child {
+      text-align: left;
+    }
+    @media print {
+      .currency {
+        font-family: 'Arial', sans-serif;
+        font-weight: bold;
+        color: black;
+      }
+    }
+  </style>
+
+</head>
+<body>
+<main  th:object="${hoaDon}">
+  <div class="header">
+<!--    <img th:src="@{/images/logoSSV2.png}" alt="logo"/>-->
+
+    <h1>Sport Shop</h1>
+    <p>Chương trình Phổ thông Cao đẳng FPT Polytechnic, Phường Canh, Từ Liêm, Hà Nội, Việt Nam</p>
+    <p>SĐT: 0822580083</p>
+    <p>Mã hóa đơn: <span th:text="${hoaDon.billCode}"></span></p>
+    <p>
+      <span th:text="${hoaDon.createAt}"></span>
+    </p>
+  </div>
+
+  <div class="info">
+    <p>Khách hàng: <span th:text="${hoaDon.getId_account().nguoiDung.full_name}"></span></p>
+    <p>Số điện thoại: <span th:text="${hoaDon.phone_number}"></span></p>
+    <p>Địa chỉ: <span th:text="${hoaDon.address}"></span></p>
+  </div>
+
+  <div class="order-details">
+    <p><strong>Nội dung đơn hàng (Tổng số lượng sản phẩm: <span th:text="${productCount}"></span>)</strong></p>
+    <table>
+      <thead>
+      <tr>
+        <th>STT</th>
+        <th>Tên</th>
+        <th>Màu</th>
+        <th>Size</th>
+        <th>Giá</th>
+        <th>Số lượng</th>
+        <th>Trạng thái</th>
+        <th>Tổng</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="item, iterStat : ${items}">
+        <td th:text="${iterStat.index + 1}"></td>
+        <td th:text="${spct[item.sanPhamChiTiet.id].sanPham.tenSanPham}"></td>
+        <td class="border px-4 py-2 text-center">
+          <div
+                  th:style="'width: 40px; height: 40px;background-color: ' + ${spct[item.sanPhamChiTiet.id].mauSac.tenMauSac}">
+          </div>
+          <span th:text="${spct[item.sanPhamChiTiet.id].mauSac.tenMauSac}">Không có màu</span>
+        </td>
+        <td th:text="${spct[item.sanPhamChiTiet.id].kichThuoc.tenKichThuoc}"></td>
+        <td id="giaSPCT" class="currency" th:text="${item.sanPhamChiTiet.gia} "></td>
+        <td th:text="${item.quantity}"></td>
+        <td th:text="${item.hoaDon.status}"></td>
+        <td id="tongTien" class="currency" th:text="${item.sanPhamChiTiet.gia} * ${item.quantity} "></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="summary">
+    <table>
+      <tr>
+        <td>Giảm giá:</td>
+        <td id="tienGiam" class="currency" th:text="${discount}"></td>
+      </tr>
+      <tr>
+        <td>Tiền Ship:</td>
+        <td id="tienShip" class="currency" th:text="${tienShip}"></td>
+      </tr>
+      <tr>
+        <td><strong>Tổng hóa đơn:</strong></td>
+        <td><strong id="tongTienThu" class="currency" th:text="${totalPayment} "></strong></td>
+      </tr>
+
+    </table>
+  </div>
+  <script>
+    function formatCurrency(amount) {
+      if (isNaN(amount)) {
+        return amount;  // Trả về giá trị gốc nếu không phải số hợp lệ
+      }
+      return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+    }
+
+    // Định dạng tất cả các giá trị tiền tệ trước khi in
+    document.querySelectorAll('.currency').forEach(function(element) {
+      let amount = parseFloat(element.innerText.replace(/[^\d.-]/g, ""));  // Loại bỏ ký tự không phải số
+      if (!isNaN(amount)) {
+        element.innerText = formatCurrency(amount);
+      }
+    });
+  </script>
+
+</main>
+</body>
+</html>

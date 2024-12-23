@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{Menu}"
+>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bán Hàng Tại Quầy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/css/Banhangtaiquay.css">
+</head>
+<body>
+<main layout:fragment="main1">
+    <div class="container mt-4">
+        <h2 class="mb-4">
+            <i class="fas fa-shopping-cart" style="margin-right: 8px;"></i>
+            Bán Hàng Tại Quầy
+        </h2>
+        <!-- Invoice Tabs -->
+        <div class="tab-container d-flex align-items-center" id="tabContainer">
+            <button class="btn btn-outline-primary ms-2" onclick="taoHoaDonCho()">+ Thêm</button>
+        </div>
+
+        <div class="row">
+            <!-- Left Column: Search and Delivery Options -->
+            <div class="col-md-8">
+                <div class="search-bar">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="sanPhamChiTiet" placeholder="Tìm kiếm hàng hóa">
+                        <span class="input-group-text">Quét Mã</span>
+                    </div>
+                    <!-- Danh sách sản phẩm -->
+                    <div id="product-list"
+                         style="display: none;max-height: 300px; overflow-y: auto;
+                          position: absolute; background-color: white;
+                          border: 1px solid #ddd; z-index: 1000; width: calc(100% - 20px);">
+                        <table>
+                            <tbody>
+                            <tr th:each="spct : ${spctDto}" th:data-id="${spct.id}">
+                                <td>
+                                    <img th:src="@{/images/{tenAnh}(tenAnh=${spct.anhSanPham.get(0).tenAnh})}"
+                                         alt="Ảnh sản phẩm" style="width: 50px; height: auto;"/>
+                                </td>
+
+                                <td>
+                                    <span th:text="${spct.sanPham.tenSanPham}"></span>
+                                    [ <span th:text="${spct.kichThuoc.tenKichThuoc}"></span> -
+                                    <span th:style="'display:inline-block; background-color: ' + ${spct.mauSac.tenMauSac} + '; width: 20px; height: 20px; border: 1px solid #000;'"></span>
+                                    <span class="color-name" id="color-name-${spct.id}" th:text="${spct.mauSac.tenMauSac}"></span>
+                                    ]
+                                </td>
+                                <td th:text="'SL: ' + ${spct.soLuong}"></td>
+
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p id="productList" class="text-center mt-3 text-muted" style="display: none;">Chưa có dữ liệu.</p>
+                    <table id="selected-products" style="width: 100%; margin-top: 20px;">
+                        <tbody>
+                        <!-- Sản phẩm đã chọn sẽ được thêm vào đây -->
+                        </tbody>
+                    </table>
+
+                </div>
+
+                <!-- Delivery Options -->
+                <h5>Nhận Hàng:</h5>
+                <div class="delivery-option">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="deliveryOption" id="Tại Quầy" checked
+                               onchange="updateDeliveryOption()">
+                        <label class="form-check-label" for="Tại Quầy">Tại Quầy</label>
+                        <small class="d-block">Có thể nhận hàng từ 7h30 đến 22h30 mọi ngày tại cửa hàng</small>
+                    </div>
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" type="radio" name="deliveryOption" id="Chuyển Phát"
+                               onchange="updateDeliveryOption()">
+                        <label class="form-check-label" for="Chuyển Phát">Chuyển Phát</label>
+                        <small class="d-block">Giao hàng toàn quốc từ 1 đến 2 ngày</small>
+                    </div>
+
+                </div>
+                <!-- Phần hiển thị địa chỉ khi chọn phương thức "Chuyển Phát" -->
+                <div class="css_select_div" id="deliveryAddress" style="display: none;">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="tinh" class="form-label">Tỉnh</label>
+                            <select class="form-select" id="tinh" name="tinh" title="Chọn Tỉnh Thành">
+                                <option value="">Tỉnh Thành</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="quan" class="form-label">Huyện</label>
+                            <select class="form-select" id="quan" name="quan" title="Chọn Quận Huyện">
+                                <option value="">Quận Huyện</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="phuong" class="form-label">Phường</label>
+                            <select class="form-select" id="phuong" name="phuong" title="Chọn Phường Xã">
+                                <option value="">Phường Xã</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="soNha" >Số nhà:
+                            <button style="margin-left: 705px" class="btn btn-primary" data-bs-toggle="modal"
+                                    data-bs-target="#addressModal">Chọn
+                            </button>
+                        </label>
+                        <input type="text" class="form-control" id="soNha"
+                               placeholder="Nhập số nhà và địa chỉ chi tiết">
+
+                    </div>
+                    <div style="display: flex; align-items: center;">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="phuongThucNhanHang" id="thanhToanTruoc" checked
+                               onchange="">
+                        <label class="form-check-label" for="thanhToanTruoc">Thanh Toán Trước</label>
+
+                    </div>
+                    <div class="form-check" style="margin-left: 10px">
+                        <input class="form-check-input" type="radio" name="phuongThucNhanHang" id="thanhToanKhiNhan"
+                               onchange="">
+                        <label class="form-check-label" for="thanhToanKhiNhan">Thanh Toán Khi Nhận</label>
+                    </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Customer Info and Total Calculation -->
+            <div class="col-md-4">
+                <!-- Thông tin khách hàng -->
+                <div class="customer-info">
+                    <div class="mb-2 align-items-center">
+                        <label for="customerDropdown" class="form-label mb-0">Khách Hàng:</label>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="openAddCustomerModal()"
+                                 >+</button>
+                    </div>
+                    <div style="position: relative;">
+                        <input type="text" class="khachHang form-control" placeholder="Nhập tên hoặc số điện thoại" />
+                        <div id="customerDropdown" class="dropdown-menu"></div>
+                    </div>
+
+                    <div class="mt-3">
+                        <div class="mb-2">
+                            <label for="customerName">Họ Tên:</label>
+                            <input type="text" class="form-control" id="customerName">
+                        </div>
+                        <div class="mb-2">
+                            <label for="phone">SĐT:</label>
+                            <input type="text" class="form-control" id="phone">
+                        </div>
+                        <div class="mb-2">
+                            <label for="email">Email:</label>
+                            <input type="email" class="form-control" id="email">
+                        </div>
+                        <div class="mb-2">
+                            <label for="customerCode">Mã KH:</label>
+                            <input type="text" class="form-control" id="customerCode" readonly>
+                        </div>
+                    </div>
+                    <!--<div class="input-group mt-2">
+                        <input type="text" class="form-control" placeholder="Nhập mã voucher">
+                        <button class="btn btn-primary">Áp Dụng</button>
+                    </div>-->
+
+                    <div class="voucher-container">
+                        <!-- Các voucher sẽ được thêm vào đây -->
+                    </div>
+
+
+                    <div style="display: flex; align-items: center;">
+                        <div class="form-check" style="margin-right: 20px;">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="tienMat" checked onchange="">
+                            <label class="form-check-label" for="tienMat">Tiền Mặt</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="chuyenKhoan" onchange="">
+                            <label class="form-check-label" for="chuyenKhoan">Chuyển Khoản</label>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Summary and Total -->
+                <table class="table summary-table">
+                    <tr>
+                        <td>Tổng:</td>
+                        <td class="text-end" id="tongTien">0</td>
+                    </tr>
+                    <tr>
+                        <td>Phí Ship:</td>
+                        <td class="text-end" id="ship">Miễn Phí</td>
+                    </tr>
+                    <tr>
+                        <td>Giảm Giá:</td>
+                        <td class="text-end" id="giamGia">0</td>
+                    </tr>
+                    <tr>
+                        <td>Thực Thu:</td>
+                        <td class="text-end" id="thucThu">0</td>
+                    </tr>
+                </table>
+                <div class="total-btn" onclick="showConfirmation()">THANH TOÁN</div>
+            </div>
+        </div>
+    </div>
+    <div id="toast" class="toast hide">
+        <span id="toast-message">Thông báo sẽ xuất hiện ở đây!</span>
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+    <div id="confirmationModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('#confirmationModal')">&times;</span>
+            <p id="modalMessage"></p>
+            <div class="button-group">
+                <button class="modal-button" onclick="capNhatHoaDon()">OK</button>
+                <button class="cancel-button" onclick="closeModal('#confirmationModal')">Hủy</button>
+            </div>
+        </div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="addCustomerModal" tabindex="-1" aria-labelledby="addCustomerModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCustomerModalLabel">Thêm Khách Hàng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Form Thêm Khách Hàng -->
+                    <form id="addCustomerForm">
+                        <div class="mb-3">
+                            <label for="customerName" class="form-label">Tên Khách Hàng</label>
+                            <input type="text" class="form-control" id="customerName2" name="customerName" required placeholder="Nhập tên khách hàng">
+                        </div>
+                        <div class="mb-3">
+                            <label for="customerPhone" class="form-label">Số Điện Thoại</label>
+                            <input type="tel" class="form-control" id="customerPhone" name="customerPhone" required placeholder="Nhập số điện thoại">
+                        </div>
+                        <div class="mb-3">
+                            <label for="customerEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="customerEmail" name="customerEmail" required placeholder="Nhập email">
+                        </div>
+                        <div class="css_select_div">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="tinhadd" class="form-label">Tỉnh</label>
+                                    <select class="form-select" id="tinhadd" name="tinh" title="Chọn Tỉnh Thành">
+                                        <option value="0" hidden>Tỉnh Thành</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="quanadd" class="form-label">Huyện</label>
+                                    <select class="form-select" id="quanadd" name="quan" title="Chọn Quận Huyện">
+                                        <option value="0" hidden>Quận Huyện</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="phuongadd" class="form-label">Phường</label>
+                                    <select class="form-select" id="phuongadd" name="phuong" title="Chọn Phường Xã">
+                                        <option value="0" hidden>Phường Xã</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="soNhaadd" class="form-label">Số nhà</label>
+                                    <input type="text" class="form-control" id="soNhaadd" placeholder="Nhập số nhà và địa chỉ chi tiết">
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-primary"  onclick="addCustomer()">Lưu Khách Hàng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="addressModal" tabindex="-1" aria-labelledby="addressModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addressModalLabel">Danh sách địa chỉ</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Danh sách địa chỉ -->
+                    <ul class="list-group">
+                        <li class="list-group-item" th:each="address, index : ${listDiaChi}">
+                            <span th:text="${address.tinh}">-</span>
+                            <span th:text="${address.quan}">-</span>
+                            <span th:text="${address.phuong}"></span>
+                            <button type="button" class="btn btn-link text-primary float-end"
+                                    onclick="selectAddress(this)">Chọn
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/js/Banhangtaiquay.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            //Lấy tỉnh thành
+            $.getJSON('https://esgoo.net/api-tinhthanh/1/0.htm', function (data_tinh) {
+                if (data_tinh.error == 0) {
+                    $.each(data_tinh.data, function (key_tinh, val_tinh) {
+                        $("#tinhadd").append('<option value="' + val_tinh.id + '">' + val_tinh.full_name + '</option>');
+                    });
+                    $("#tinhadd").change(function (e) {
+                        var idtinh = $(this).val();
+                        //Lấy quận huyện
+                        $.getJSON('https://esgoo.net/api-tinhthanh/2/' + idtinh + '.htm', function (data_quan) {
+                            if (data_quan.error == 0) {
+                                $("#quanadd").html('<option value="0">Quận Huyện</option>');
+                                $("#phuongadd").html('<option value="0">Phường Xã</option>');
+                                $.each(data_quan.data, function (key_quan, val_quan) {
+                                    $("#quanadd").append('<option value="' + val_quan.id + '">' + val_quan.full_name + '</option>');
+                                });
+                                //Lấy phường xã
+                                $("#quanadd").change(function (e) {
+                                    var idquan = $(this).val();
+                                    $.getJSON('https://esgoo.net/api-tinhthanh/3/' + idquan + '.htm', function (data_phuong) {
+                                        if (data_phuong.error == 0) {
+                                            $("#phuongadd").html('<option value="0">Phường Xã</option>');
+                                            $.each(data_phuong.data, function (key_phuong, val_phuong) {
+                                                $("#phuongadd").append('<option value="' + val_phuong.id + '">' + val_phuong.full_name + '</option>');
+
+                                            });
+                                        }
+                                    });
+                                });
+
+                            }
+                        });
+                    });
+
+                }
+            });
+
+        });
+    </script>
+</main>
+</body>
+</html>

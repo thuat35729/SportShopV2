@@ -1,0 +1,425 @@
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    width: 90%;
+    margin: 20px auto;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.header i {
+    font-size: 24px;
+    margin-right: 10px;
+}
+.header img{
+    margin-right: 5px;
+}
+.header h1 {
+    font-size: 24px;
+    margin: 0;
+}
+
+.section {
+    margin-top: 20px;
+}
+
+.section h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.section h2 i {
+    margin-right: 10px;
+}
+
+.customer-info, .order-info {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+.customer-info div, .order-info div {
+    width: 48%;
+}
+
+.customer-info div p, .order-info div p {
+    margin: 5px 0;
+}
+
+.customer-info div p span, .order-info div p span {
+    font-weight: bold;
+}
+
+.status-buttons {
+    display: flex;
+    align-items: center;
+}
+
+.status-buttons button {
+    margin-left: 10px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+}
+
+.status-buttons .success {
+    background-color: #00aaff;
+}
+
+.status-buttons .online {
+    background-color: #8000ff;
+}
+
+.order-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.order-table th, .order-table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.order-table th {
+    background-color: #ff6600;
+    color: #fff;
+}
+
+.order-table td img {
+    width: 50px;
+    height: 50px;
+}
+
+.order-table .status {
+    background-color: #00ff00;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.order-table .action {
+    text-align: center;
+}
+
+.order-table .action button {
+    background-color: #00aaff;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    position: relative;
+    z-index: 10;
+}
+
+.return-all {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
+.return-all button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.cart-table {
+    width: 70%;
+    background-color: #fff;
+    border-collapse: collapse;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.cart-table th, .cart-table td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+.cart-table th {
+    background-color: #f37021;
+    color: #fff;
+}
+.cart-table td img {
+    width: 50px;
+    height: auto;
+}
+.cart-table .delete-btn {
+    color: red;
+    cursor: pointer;
+}
+.summary {
+    width: 25%;
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.summary p {
+    margin: 10px 0;
+    font-size: 14px;
+}
+.summary p span {
+    float: right;
+    color: blue;
+}
+.summary .total {
+    font-weight: bold;
+}
+.summary .return {
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+.summary .return textarea {
+    width: 100%;
+    height: 50px;
+    border: 1px solid #ddd;
+    padding: 5px;
+}
+.summary .return button {
+    width: 100%;
+    padding: 10px;
+    background-color: green;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+.container2 {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+}
+button {
+    transition: transform 0.2s; /* Thêm hiệu ứng chuyển tiếp */
+}
+
+button:hover {
+    transform: scale(1.1); /* Phóng to nút lên 10% */
+}
+
+/* Nếu bạn muốn áp dụng hiệu ứng cho các nút cụ thể */
+.status-buttons button:hover,
+.order-table .action button:hover,
+.return-all button:hover {
+    transform: scale(1.1); /* Phóng to nút lên 10% */
+}
+
+#myModal {
+    display: none; /* Ẩn modal mặc định */
+    position: fixed; /* Định vị cố định */
+    z-index: 1000; /* Đặt z-index cao để nằm trên các phần tử khác */
+    left: 0;
+    top: 0;
+    width: 100%; /* Chiều rộng 100% */
+    height: 100%; /* Chiều cao 100% */
+    overflow: auto; /* Thêm thanh cuộn nếu cần */
+    background-color: rgba(0, 0, 0, 0.5); /* Nền mờ */
+}
+
+/* Modal content */
+.modal-content {
+    background-color: #fefefe; /* Nền trắng cho nội dung modal */
+    margin: 15% auto; /* Đặt margin trên và dưới 15%, tự động căn giữa */
+    padding: 20px; /* Padding cho nội dung */
+    border: 1px solid #888; /* Đường viền */
+    width: 80%; /* Chiều rộng modal */
+    max-width: 500px; /* Chiều rộng tối đa */
+    border-radius: 5px; /* Bo góc */
+}
+
+/* Đóng modal */
+.close {
+    color: #aaa; /* Màu chữ */
+    float: right; /* Đặt ở bên phải */
+    font-size: 28px; /* Kích thước chữ */
+    font-weight: bold; /* Đậm */
+}
+
+.close:hover,
+.close:focus {
+    color: black; /* Màu khi hover */
+    text-decoration: none; /* Không gạch chân */
+    cursor: pointer; /* Con trỏ chuột */
+}
+#infoSection {
+    border: 1px solid #ddd; /* Bo viền xung quanh */
+    border-radius: 8px; /* Bo góc */
+    padding: 15px;
+    margin-top: 20px;
+    background-color: #f9f9f9; /* Màu nền nhẹ */
+}
+
+.form-group {
+    display: flex;
+    justify-content: space-between; /* Đưa label và span ra 2 bên */
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.form-group label {
+    font-weight: bold;
+    margin-right: 10px; /* Khoảng cách giữa label và span */
+    flex: 1; /* Đảm bảo label chiếm không gian thích hợp */
+}
+
+.form-group span {
+    text-align: right; /* Đảm bảo text của span nằm ở bên phải */
+    flex: 1; /* Đảm bảo span chiếm phần còn lại */
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid #ddd; /* Đường kẻ giữa các phần */
+    margin: 15px 0;
+}
+
+.total {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+}
+#confirmationModal .modal-content {
+    background-color: #ffffff;
+    padding: 30px;
+    width: 90%;
+    max-width: 400px;
+    margin: 10% auto;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+#confirmationModal .modal-message {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+/* Button group styling */
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 15px;
+}
+
+/* Button styling */
+#confirmationModal .modal-button,
+#confirmationModal .cancel-button {
+    padding: 10px 25px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    min-width: 100px;
+}
+
+/* OK button */
+#confirmationModal .modal-button {
+    background-color: #28a745;
+    color: #ffffff;
+}
+
+#confirmationModal .modal-button:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+}
+
+/* Cancel button */
+#confirmationModal .cancel-button {
+    background-color: #6c757d;
+    color: #ffffff;
+}
+
+#confirmationModal .cancel-button:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+}
+
+/* Close button styling */
+#confirmationModal .close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 24px;
+    color: #999;
+    cursor: pointer;
+}
+
+#confirmationModal .close:hover {
+    color: #333;
+}
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1050;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+/* Phần nội dung của modal */
+.modal-content {
+    position: relative;
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    border-radius: 8px;
+}
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+

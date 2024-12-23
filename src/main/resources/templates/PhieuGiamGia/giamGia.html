@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{Menu}"
+>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <title>Phiếu Giảm Giá</title>
+    <link rel="stylesheet" href="/css/giamGia.css">
+</head>
+
+<body>
+<main layout:fragment="main1">
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>Phiếu Giảm Giá</h1>
+            </div>
+            <div class="add-button">
+                <button><i class="fas fa-user-plus"></i> <a href="/giam-gia/add-giam-gia" style="text-decoration: none; color: black"> Thêm Mới</a></button>
+            </div>
+        </div>
+        <div class="filter-section">
+            <div class="filter-row">
+                <div>
+                    <input type="text" placeholder="Tìm kiếm.">
+                </div>
+                <div>
+                    <input type="date" placeholder="Từ">
+                </div>
+                <div>
+                    <input type="date" placeholder="Đến">
+                </div>
+            </div>
+        </div>
+        <div class="table-section">
+            <h2>Danh Sách Phiếu Giảm Giá</h2>
+            <table>
+                <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>MÃ</th>
+                    <th>TÊN PHIẾU</th>
+                    <th>LOẠI PHIẾU</th>
+                    <th>SỐ LƯỢNG</th>
+                    <th>GIÁ TRỊ GIẢM</th>
+                    <th>GIÁ TRỊ TỐI THIỂU</th>
+                    <th>NGÀY BẮT ĐẦU</th>
+                    <th>NGÀY KẾT THÚC</th>
+                    <th>TRẠNG THÁI</th>
+                    <th>HÀNH ĐỘNG</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="vc, iterStat : ${listVC}">
+                    <td th:text="${iterStat.index + 1}"></td> <!-- STT -->
+                    <td th:text="${vc.voucherCode}"></td> <!-- Mã -->
+                    <td th:text="${vc.name}"></td> <!-- Tên phiếu -->
+                    <td  th:text="${vc.formVoucher}"></td> <!-- Loại phiếu -->
+                    <td th:text="${vc.quantity}"></td> <!-- Số lượng -->
+                    <td class="discountValue" th:attr="data-form-voucher=${vc.formVoucher}" th:text="${vc.discountValue}"></td>
+                    <td class="minimumValue" th:text="${vc.minimumValue}"></td>
+                    <td th:text="${vc.startDate}"></td> <!-- Ngày bắt đầu -->
+                    <td th:text="${vc.endDate}"></td> <!-- Ngày kết thúc -->
+                    <td th:class="${vc.getStatus() == 'Chưa diễn ra' ? 'bg-yellow' : (vc.getStatus() == 'Hết hạn' ? 'bg-red' : (vc.getStatus() == 'Đang diễn ra' ? 'bg-green' : 'bg-gray'))}">
+                        <span style="color: black;">[[${vc.getStatus()}]]</span>
+                    </td>
+                    <td>
+                        <a th:href="@{/giam-gia/detail/{id}(id=${vc.id})}" title="Chỉnh sửa">
+                            <i class="fas fa-pencil-alt"></i> <!-- Biểu tượng bút chì -->
+                        </a>
+                        <form th:action="@{/giam-gia/delete/{id}(id=${vc.id})}" method="post" style="display:inline;">
+                            <button type="submit" class="icon" title="Xóa" onclick="return confirm('Bạn có chắc chắn muốn xóa phiếu giảm giá này?');">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="/js/GiamGia.js"></script>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{Menu}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý trả hàng</title>
+    <link rel="stylesheet" href="/css/DoiTraChiTiet.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <script>
+
+    </script>
+</head>
+
+<body>
+<main layout:fragment="main1">
+    <div class="container">
+        <input type="hidden" id="idHoaDon" th:value="${hoaDon.id}">
+
+        <div class="header">
+            <img src="/images/doitra.png" width="50px" height="50px">
+            <h1>Quản lý trả hàng</h1>
+        </div>
+
+        <!-- Thông tin khách hàng -->
+        <div class="section">
+            <h2><i class="fas fa-info-circle"></i> Thông tin khách hàng</h2>
+            <div class="customer-info">
+                <div>
+                    <p><span>Tên khách hàng:</span> <span th:text="${hoaDon.user_name}"></span></p>
+                    <p><span>Số điện thoại:</span> <span th:text="${hoaDon.phone_number}"></span></p>
+                    <p><span>Địa chỉ:</span> <span th:text="${hoaDon.address}"></span></p>
+                    <p><span>Ghi chú:</span> <span th:text="${hoaDon.note}"></span></p>
+                </div>
+                <div>
+                    <p><span>Ngày giao hàng:</span> <span th:text="${hoaDon.ship_date}"></span></p>
+                    <p><span>Ngày nhận hàng:</span> <span th:text="${hoaDon.receive_date}"></span></p>
+                    <div class="status-buttons">
+                        <button class="success"><span th:text="${hoaDon.status}"></span></button>
+                        <button class="online"><span th:text="${hoaDon.type}"></span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Thông tin đơn hàng</h2>
+            <table class="order-table">
+                <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Thông tin sản phẩm</th>
+                    <th>Màu Sắc</th>
+                    <th>Số lượng</th>
+                    <th>Tổng tiền</th>
+                    <th>Trạng thái</th>
+                    <th>Hành động</th>
+                </tr>
+                </thead>
+                <tbody  >
+                <tr th:each="item, iterStat : ${hoaDon.billDetails}" th:attr="data-idHDCT=${item.id}" >
+                    <td th:text="${iterStat.index + 1}"></td>
+                    <td>
+                        <p th:attr="data-idSPCT=${item.sanPhamChiTiet.id}" th:text="${item.sanPhamChiTiet.idSanPham.tenSanPham}"></p>
+
+                        <p id="price" style="color: red; font-weight: bold;" th:text="${item.sanPhamChiTiet.gia} "></p>
+
+                    </td>
+                    <td>
+                        <div th:style="'width: 25px; height: 25px; border-radius: 50%; background-color: ' + ${item.sanPhamChiTiet.idMauSac.tenMauSac}">
+
+                        </div>
+                        <span class="color-name" id="color-name-${item.sanPhamChiTiet.idMauSac.tenMauSac}" th:text="${item.sanPhamChiTiet.idMauSac.tenMauSac}">Không có màu</span>
+                        <span th:text="'- '+${item.sanPhamChiTiet.idKichThuoc.tenKichThuoc}"></span>
+                    </td>
+                    <td id="totalQuantity" th:text="${item.quantity}"></td>
+                    <td id="totalPayment" th:text="${item.quantity}*${item.sanPhamChiTiet.gia} "></td>
+                    <td>
+                        <div class="status" th:text="${hoaDon.status}"></div>
+                    </td>
+                    <td class="action">
+                        <button th:data-product-name="${item.sanPhamChiTiet.idSanPham.tenSanPham}"
+                                onclick="openModal(this.dataset.id, this.parentNode.parentNode)">
+                            <i class="fas fa-undo"></i>
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <!-- Nút trả hàng tất cả -->
+            <div class="return-all">
+                <button id="return-all-btn" >Trả hàng tất cả</button>
+            </div>
+        </div>
+    </div>
+    <div class="container2">
+        <table class="cart-table">
+            <thead>
+            <tr>
+                <th>Tên sản phẩm</th>
+                <th>Màu Sắc</th>
+                <th>Số lượng</th>
+                <th>Giá tiền</th>
+                <th>Tổng tiền</th>
+                <th>Hành động</th>
+            </tr>
+            </thead>
+            <tbody id="return-items">
+
+            </tbody>
+        </table>
+
+        <div class="summary" id="summary" th:each="item, iterStat : ${hoaDon.billDetails}" style="display: none;">
+            <div id="infoSection">
+                <div class="form-group">
+                    <label for="tong-tientt">Tổng tiền khách thanh toán:</label>
+                    <span id="tong-tientt" th:text="${hoaDon.total_money} + ' đ'"></span>
+                </div>
+                <div class="form-group">
+                    <label for="tong-tien">Giá trị voucher đã áp dụng:</label>
+                    <span id="tong-tien" th:text="${hoaDon.money_reduced} + ' đ'"></span>
+                </div>
+                <div class="form-group">
+                    <label for="tien-ship">Tiền Ship</label>
+                    <span id="tien-ship" th:text="${hoaDon.money_ship} + ' đ'"></span>
+                </div>
+                <hr>
+                <div class="form-group">
+                    <label for="tien-tra-khach">Tổng tiền bill hoàn trả:</label>
+                    <span id="tien-tra-khach"></span>
+                </div>
+            </div>
+            <div class="return">
+                <p>* Mô tả:</p>
+                <textarea id="moTa"  placeholder="Nhập mô tả" th:placeholder="'Nhập mô tả'"></textarea>
+                    <input type="hidden" name="maHoaDon" id="maHoaDon" th:value="${hoaDon.id}"/>
+                    <button onclick="showConfirmation()">Xác Nhận</button>
+            </div>
+        </div>
+    </div>
+    </div>
+
+
+    <div id="myModal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Thêm sản phẩm</h2>
+            <form onsubmit="event.preventDefault(); addItem();">
+                <label for="quantity">Số lượng:</label>
+                <input type="number" id="quantity" min="1" required>
+                <button type="submit">Thêm</button>
+            </form>
+        </div>
+    </div>
+    <div id="confirmationModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('#confirmationModal')">&times;</span>
+            <p id="modalMessage"></p>
+            <div class="button-group">
+                <button class="modal-button" onclick="checkFullReturnStatus()">OK</button>
+                <button class="cancel-button" onclick="closeConfirmationModal('#confirmationModal')">Hủy</button>
+            </div>
+        </div>
+    </div>
+    <script src="/js/DoiTra.js"></script>
+    <script>
+        function getColorName(colorCode, el) {
+            // Nếu colorCode là RGB, chuyển sang Hex
+            const hexCode = colorCode.startsWith('#') ? colorCode : rgbToHex(colorCode);
+
+            if (!hexCode) {
+                el.textContent = "Không xác định được mã màu";
+                return;
+            }
+
+            fetch(`https://www.thecolorapi.com/id?hex=${hexCode.substring(1)}`)
+                .then(response => response.json())
+                .then(data => {
+                    el.textContent = data.name.value; // Cập nhật tên màu vào phần tử span
+                })
+                .catch(error => {
+                    console.error("Lỗi khi gọi API lấy tên màu:", error);
+                    el.textContent = "Không tìm thấy tên màu"; // Hiển thị lỗi nếu không lấy được tên màu
+                });
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+            // Lấy tất cả các phần tử chứa mã màu
+            document.querySelectorAll('.color-name').forEach(function (el) {
+                const colorHex = el.innerText.trim(); // Lấy mã hex từ nội dung của phần tử span
+                if (colorHex.startsWith('#')) { // Kiểm tra mã có hợp lệ không
+                    getColorName(colorHex, el); // Gọi hàm để lấy tên màu từ API
+                } else {
+                    el.textContent = "Tên màu không hợp lệ"; // Nếu mã không hợp lệ, hiển thị thông báo lỗi
+                }
+            });
+        });
+    </script>
+</main>
+
+</body>
+</html>
